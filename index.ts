@@ -1,18 +1,18 @@
-import { Project, ts, TypeAliasDeclaration } from "ts-morph";
+import { Project, ts } from "ts-morph";
 import grabSubNodes from "./grabSubNodes";
 import categorizeNodes from "./categorizeNodes";
 import extractProperties from "./extractProperties";
-import {
-  isExportSpecifier,
-} from "typescript";
+import { isExportSpecifier } from "typescript";
 import findParentTypeAlias from "./findParentTypeNode";
+import * as fs from "fs";
+import path from "path";
 type GenerateSchema = {
   configPath: string;
   identifier: string;
   filePath: string;
 };
 
-const generateSchema = ({
+export const generateSchema = ({
   configPath,
   filePath,
   identifier,
@@ -34,13 +34,19 @@ const generateSchema = ({
   }
   const { imports, identifiers } = categorizeNodes(nodes);
   const idParent = findParentTypeAlias(identifiers[identifier].parent);
-  if(!idParent) return{}
+  if (!idParent) return {};
   const properties = extractProperties({
     imports: imports,
     ids: identifiers,
     node: idParent,
+    paths: {
+      configPath,
+      filePath,
+      identifier
+    },
+    props: {}
   });
-  console.log(properties);
+  return properties;
 };
 
 //seperate file
@@ -48,8 +54,15 @@ const projectPath = "../Documenting Ukraine/Documentating Ukraine";
 const configPath = projectPath + "/tsconfig.json";
 const filePath = projectPath + "/src/types/dataTypes/WarCrimes.tsx";
 
-export default generateSchema({
+const jsonSchema = generateSchema({
   configPath: configPath,
   identifier: "WarCrimes",
   filePath: filePath,
 });
+const currDirectory = path.join(__dirname, "/jsonSchema.json");
+fs.writeFile(
+  currDirectory,
+  JSON.stringify(jsonSchema),
+  { flag: "w+" },
+  (err) => {}
+);

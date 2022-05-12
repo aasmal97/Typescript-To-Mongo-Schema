@@ -1,6 +1,7 @@
 import {
   isIdentifier,
   isImportDeclaration,
+  isInterfaceDeclaration,
   isTypeAliasDeclaration,
   isVariableDeclaration,
 } from "typescript";
@@ -15,6 +16,7 @@ function categorizeNodes(nodes: ts.Node[]) {
     if (
       isIdentifier(node) &&
       (isTypeAliasDeclaration(node.parent) ||
+        isInterfaceDeclaration(node.parent) ||
         isVariableDeclaration(node.parent))
     )
       identifiers[node.escapedText.toString()] = node;
