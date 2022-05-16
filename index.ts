@@ -2,7 +2,7 @@ import { Project, ts } from "ts-morph";
 import grabSubNodes from "./grabSubNodes";
 import categorizeNodes from "./categorizeNodes";
 import extractProperties from "./extractProperties";
-import { isExportSpecifier } from "typescript";
+import { isExportSpecifier, isInterfaceDeclaration } from "typescript";
 import findParentTypeAlias from "./findParentTypeNode";
 import * as fs from "fs";
 import path from "path";

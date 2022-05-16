@@ -1,5 +1,6 @@
 import { ExtractProps } from "./extractProperties";
 import extractProperties from "./extractProperties";
+import { isIdentifier } from "typescript";
 function mergeProps({ node, imports, ids, paths, props }: ExtractProps) {
   const mergedProps: {
     bsonType: string;
@@ -11,6 +12,7 @@ function mergeProps({ node, imports, ids, paths, props }: ExtractProps) {
     required: [],
   };
   node.forEachChild((n) => {
+    if (isIdentifier(n)) return 
     const extracted = extractProperties({
       imports,
       ids,

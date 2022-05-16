@@ -8,7 +8,9 @@
       "properties": {
         "_id": { "bsonType": "string" },
         "record_title": { "bsonType": "string" },
-        "record_creation_date": { "anyOf": [{}, {}] },
+        "record_creation_date": {
+          "anyOf": [{ "bsonType": "date" }, { "bsonType": "string" }]
+        },
         "media": {
           "bsonType": "object",
           "properties": {
@@ -38,8 +40,12 @@
         "description": { "bsonType": "string" },
         "evidence": { "bsonType": "object", "properties": {}, "required": [] },
         "additional_evidence": {},
-        "date_first_published": { "anyOf": [{}, {}] },
-        "date_event_occured": { "anyOf": [{}, {}] },
+        "date_first_published": {
+          "anyOf": [{ "bsonType": "date" }, { "bsonType": "string" }]
+        },
+        "date_event_occured": {
+          "anyOf": [{ "bsonType": "date" }, { "bsonType": "string" }]
+        },
         "address": {
           "bsonType": "object",
           "properties": {
@@ -73,7 +79,9 @@
       "properties": {
         "_id": { "bsonType": "string" },
         "record_title": { "bsonType": "string" },
-        "record_creation_date": { "anyOf": [{}, {}] },
+        "record_creation_date": {
+          "anyOf": [{ "bsonType": "date" }, { "bsonType": "string" }]
+        },
         "media": {
           "bsonType": "object",
           "properties": {
@@ -103,8 +111,12 @@
         "description": { "bsonType": "string" },
         "evidence": { "bsonType": "object", "properties": {}, "required": [] },
         "additional_evidence": {},
-        "date_first_published": { "anyOf": [{}, {}] },
-        "date_event_occured": { "anyOf": [{}, {}] },
+        "date_first_published": {
+          "anyOf": [{ "bsonType": "date" }, { "bsonType": "string" }]
+        },
+        "date_event_occured": {
+          "anyOf": [{ "bsonType": "date" }, { "bsonType": "string" }]
+        },
         "address": {
           "bsonType": "object",
           "properties": {

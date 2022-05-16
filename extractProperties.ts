@@ -1,11 +1,12 @@
 import { ts } from "ts-morph";
-import { isIdentifier } from "typescript";
+import { isIdentifier, isInterfaceDeclaration } from "typescript";
 import findParentTypeAlias from "./findParentTypeNode";
 import mergeProps from "./mergeProps";
 import parseProperties from "./parseStatements/parseProperties";
 import { generateSchema } from "./";
 import mergeObj from "./mergeObj";
 import path from "path";
+import convertValue from "./convertPropValues";
 
 export type ExtractProps = {
   imports: { [key: string]: string };
@@ -15,7 +16,7 @@ export type ExtractProps = {
   paths: {
     configPath: string;
     filePath: string;
-      identifier: string;
+    identifier: string;
   };
 };
 
@@ -35,12 +36,12 @@ function extractProperties({ imports, ids, node, paths, props }: ExtractProps) {
       break;
     case "UnionType":
       props = {
-        anyOf: []
+        anyOf: [],
       };
       node.forEachChild((n) => {
-        props.anyOf.push(
-            {...extractProperties({ imports, ids, node: n, paths, props: {} })}
-        );
+        props.anyOf.push({
+          ...extractProperties({ imports, ids, node: n, paths, props: {} }),
+        });
       });
       break;
     case "PropertySignature":
@@ -50,45 +51,73 @@ function extractProperties({ imports, ids, node, paths, props }: ExtractProps) {
       node.forEachChild((node) => {
         if (isIdentifier(node)) {
           const nodeName = node.escapedText.toString();
-          //lookup node in ids, and recurse back to find props
-          if (nodeName in ids) {
-            const idParent = findParentTypeAlias(ids[nodeName].parent);
-            if (!idParent) return props;
-            props = mergeObj({ node: idParent, imports, ids, paths, props });
-          } else if (nodeName in imports) {
-            /*
-                1. lookup node in imports, and find file. 
-                2. Then find id, and recurse back to find props
-            */
-            const importRelative = imports[nodeName].substring(1, imports[nodeName].length-1)
-            const newPathRelative = importRelative + ".tsx"
-            const parsedRelative = newPathRelative.split(path.posix.sep)
-            let newFilePath = paths.filePath
+          switch (true) {
+            //built in types
+            case nodeName === "Date":
+              props = { bsonType: "date" };
+              break;
+            case nodeName === "ObjectId":
+              props = { bsonType: "objectId" };
+              break;
+            //lookup node in ids, and recurse back to find props
+            case nodeName in ids:
+              const idParent = findParentTypeAlias(ids[nodeName].parent);
+              if (!idParent) return props;
+              if (isInterfaceDeclaration(idParent))
+                props = mergeProps({
+                  node: idParent,
+                  imports,
+                  ids,
+                  paths,
+                  props,
+                });
+              else
+                props = mergeObj({
+                  node: idParent,
+                  imports,
+                  ids,
+                  paths,
+                  props,
+                });
+              break;
+            case nodeName in imports:
+              /*
+                  1. lookup node in imports, and find file. 
+                  2. Then find id, and recurse back to find props
+              */
+              const importRelative = imports[nodeName].substring(
+                1,
+                imports[nodeName].length - 1
+              );
+              const newPathRelative = importRelative + ".tsx";
+              const parsedRelative = newPathRelative.split(path.posix.sep);
+              let newFilePath = paths.filePath;
               for (let segment of parsedRelative) {
-                let newSegment = segment
-                  if (segment === ".") newSegment = ".."
-                else if(segment === "..") newSegment = "../../"
-                newFilePath = path.resolve(
-                    newFilePath,
-                    newSegment
-                );
-            }
-            props = {
-              ...props,
-              ...generateSchema({
-                configPath: paths.configPath,
-                filePath: newFilePath,
-                identifier: nodeName,
-              }),
-            };
+                let newSegment = segment;
+                if (segment === ".") newSegment = "..";
+                else if (segment === "..") newSegment = "../../";
+                newFilePath = path.resolve(newFilePath, newSegment);
+              }
+              props = {
+                ...props,
+                ...generateSchema({
+                  configPath: paths.configPath,
+                  filePath: newFilePath,
+                  identifier: nodeName,
+                }),
+              };
+              break;
+            default:
+              break;
           }
         }
       });
       break;
     default:
+      const newProps = convertValue(node);
+      if (newProps && typeof newProps !== "string") props = newProps;
       break;
   }
-  //console.log(props, ts.SyntaxKind[node.kind]);
   return props;
 }
 export default extractProperties;

@@ -17,7 +17,6 @@ function mergeObj({ node, imports, ids, paths, props }: ExtractProps) {
       paths,
       props
     });
-    //console.log(extracted);
       if (extracted.properties && extracted.required)
           mergedProps = {
               ...mergedProps,

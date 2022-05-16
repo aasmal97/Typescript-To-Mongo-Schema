@@ -7,8 +7,12 @@ function convertValue(node: ts.Node):
   | {
       [key: string]: any;
       bsonType: string;
-    } {
-  if (isIdentifier(node)) return node.escapedText.toString();
+  } {
+  if (isIdentifier(node)) {
+    const name = node.escapedText.toString();
+    if(name === "Date") return {"bsonType": 'date'}
+    return name
+  }
   if (isLiteralTypeNode(node)) return convertValue(node.literal)
   if (isStringLiteral(node))
     return {
@@ -32,6 +36,7 @@ function convertValue(node: ts.Node):
     case "FalseKeyword":
       return { bsonType: "bool", enum: [false] };
     default:
+      
       return undefined;
   }
 }
