@@ -1,6 +1,6 @@
 import { ExtractProps } from "../extractProperties";
 import { isIdentifier, isPropertySignature } from "typescript";
-import convertValue from "../convertPropValues";
+import convertValue from "./parsePropValues";
 import extractProperties from "../extractProperties";
 
 function parseProperties({ node, imports, ids, paths, props }: ExtractProps) {

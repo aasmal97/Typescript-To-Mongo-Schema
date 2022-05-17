@@ -1,9 +1,9 @@
-import { Project, ts } from "ts-morph";
-import grabSubNodes from "./grabSubNodes";
+import { Project, ts, TypeChecker} from "ts-morph";
+import grabSubNodes from "./searchNodeFunc/findSubNode";
 import categorizeNodes from "./categorizeNodes";
 import extractProperties from "./extractProperties";
-import { isExportSpecifier, isInterfaceDeclaration } from "typescript";
-import findParentTypeAlias from "./findParentTypeNode";
+import { isExportSpecifier } from "typescript";
+import findParentTypeAlias from "./searchNodeFunc/findParentTypeNode";
 import * as fs from "fs";
 import path from "path";
 type GenerateSchema = {
@@ -21,7 +21,11 @@ export const generateSchema = ({
     tsConfigFilePath: configPath,
   });
   const file = project.getSourceFileOrThrow(filePath);
-  const statements = file.compilerNode.statements;
+  const node = file.compilerNode;
+  const statements = node.statements;
+  const bDecl = file.getStatements()[0]
+  const bType = TypeChecker.prototype.getTypeAtLocation(bDecl)
+
   let nodes: ts.Node[] = [];
   for (const statement of statements) {
     nodes = [
@@ -34,6 +38,7 @@ export const generateSchema = ({
   }
   const { imports, identifiers } = categorizeNodes(nodes);
   const idParent = findParentTypeAlias(identifiers[identifier].parent);
+    // console.log(Object.keys(imports), Object.keys(identifiers));
   if (!idParent) return {};
   const properties = extractProperties({
     imports: imports,
@@ -42,13 +47,12 @@ export const generateSchema = ({
     paths: {
       configPath,
       filePath,
-      identifier
+      identifier,
     },
-    props: {}
+    props: {},
   });
   return properties;
 };
-
 //seperate file
 const projectPath = "../Documenting Ukraine/Documentating Ukraine";
 const configPath = projectPath + "/tsconfig.json";

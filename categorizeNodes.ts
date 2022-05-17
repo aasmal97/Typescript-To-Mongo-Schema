@@ -6,7 +6,7 @@ import {
   isVariableDeclaration,
 } from "typescript";
 import { ts } from "ts-morph";
-import grabSubNodes from "./grabSubNodes";
+import grabSubNodes from "./searchNodeFunc/findSubNode";
 
 function categorizeNodes(nodes: ts.Node[]) {
   const imports: { [key: string]: string } = {};

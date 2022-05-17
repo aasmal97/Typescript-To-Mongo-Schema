@@ -1,13 +1,13 @@
-import { ts } from "ts-morph";
-import { isIdentifier, isInterfaceDeclaration } from "typescript";
-import findParentTypeAlias from "./findParentTypeNode";
-import mergeProps from "./mergeProps";
+import { ts, TypeChecker } from "ts-morph";
+import { isIdentifier, isInterfaceDeclaration, isPropertySignature, isTypeAliasDeclaration } from "typescript";
+import findParentTypeAlias from "./searchNodeFunc/findParentTypeNode";
+import mergeProps from "./mergeFuncs/mergeProps";
 import parseProperties from "./parseStatements/parseProperties";
 import { generateSchema } from "./";
-import mergeObj from "./mergeObj";
+import mergeObj from "./mergeFuncs/mergeObj";
 import path from "path";
-import convertValue from "./convertPropValues";
-
+import convertValue from "./parseStatements/parsePropValues";
+import parseGenerics from "./parseStatements/parseGenerics";
 export type ExtractProps = {
   imports: { [key: string]: string };
   ids: { [key: string]: ts.Node };
@@ -31,7 +31,7 @@ function extractProperties({ imports, ids, node, paths, props }: ExtractProps) {
     case "InterfaceDeclaration":
       props = mergeProps({ node, imports, ids, paths, props });
       break;
-    case "TypeAliasDeclaration":
+    case "TypeAliasDeclaration":      
       props = mergeObj({ node, imports, ids, paths, props });
       break;
     case "UnionType":
@@ -63,7 +63,7 @@ function extractProperties({ imports, ids, node, paths, props }: ExtractProps) {
             case nodeName in ids:
               const idParent = findParentTypeAlias(ids[nodeName].parent);
               if (!idParent) return props;
-              if (isInterfaceDeclaration(idParent))
+              else if (isInterfaceDeclaration(idParent))
                 props = mergeProps({
                   node: idParent,
                   imports,

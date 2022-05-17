@@ -1,5 +1,10 @@
 import { ts } from "ts-morph";
-import { isIdentifier, isLiteralTypeNode, isNumericLiteral, isStringLiteral } from "typescript";
+import {
+  isIdentifier,
+  isLiteralTypeNode,
+  isNumericLiteral,
+  isStringLiteral,
+} from "typescript";
 
 function convertValue(node: ts.Node):
   | string
@@ -7,13 +12,13 @@ function convertValue(node: ts.Node):
   | {
       [key: string]: any;
       bsonType: string;
-  } {
+    } {
   if (isIdentifier(node)) {
     const name = node.escapedText.toString();
-    if(name === "Date") return {"bsonType": 'date'}
-    return name
+    if (name === "Date") return { bsonType: "date" };
+    return name;
   }
-  if (isLiteralTypeNode(node)) return convertValue(node.literal)
+  if (isLiteralTypeNode(node)) return convertValue(node.literal);
   if (isStringLiteral(node))
     return {
       bsonType: "string",
@@ -36,7 +41,6 @@ function convertValue(node: ts.Node):
     case "FalseKeyword":
       return { bsonType: "bool", enum: [false] };
     default:
-      
       return undefined;
   }
 }

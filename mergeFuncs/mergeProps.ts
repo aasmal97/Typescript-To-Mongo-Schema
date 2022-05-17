@@ -1,5 +1,4 @@
-import { ExtractProps } from "./extractProperties";
-import extractProperties from "./extractProperties";
+import extractProperties, { ExtractProps } from "../extractProperties";
 import { isIdentifier } from "typescript";
 function mergeProps({ node, imports, ids, paths, props }: ExtractProps) {
   const mergedProps: {
