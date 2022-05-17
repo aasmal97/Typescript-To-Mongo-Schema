@@ -1,4 +1,4 @@
-import { Project, ts, TypeChecker} from "ts-morph";
+import { Project, ts} from "ts-morph";
 import grabSubNodes from "./searchNodeFunc/findSubNode";
 import categorizeNodes from "./categorizeNodes";
 import extractProperties from "./extractProperties";
@@ -23,9 +23,7 @@ export const generateSchema = ({
   const file = project.getSourceFileOrThrow(filePath);
   const node = file.compilerNode;
   const statements = node.statements;
-  const bDecl = file.getStatements()[0]
-  const bType = TypeChecker.prototype.getTypeAtLocation(bDecl)
-
+  const types = file.getTypeAliases()
   let nodes: ts.Node[] = [];
   for (const statement of statements) {
     nodes = [
