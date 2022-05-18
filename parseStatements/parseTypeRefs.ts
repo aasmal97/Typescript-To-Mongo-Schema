@@ -3,7 +3,7 @@ import generateNewFilePath from "../utilityFuncs/generateNewFilePath";
 import findParentTypeAlias from "../searchNodeFunc/findParentTypeNode";
 import mergeObj from "../mergeFuncs/mergeObj";
 import mergeProps from "../mergeFuncs/mergeProps";
-import { generateSchema } from "../";
+import { generateSchema } from "../generateSchema";
 import { ExtractProps } from "../extractProperties";
 const parseTypeRef = ({
     node, 

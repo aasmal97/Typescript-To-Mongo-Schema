@@ -1,4 +1,4 @@
-import { GenerateSchema } from "../";
+import { GenerateSchema } from "../generateSchema";
 import { Project, ts } from "ts-morph";
 import grabSubNodes from "../searchNodeFunc/findSubNode";
 import { isExportSpecifier } from "typescript";
