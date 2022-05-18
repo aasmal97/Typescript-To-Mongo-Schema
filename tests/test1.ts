@@ -3,7 +3,7 @@ import path from "path";
 import * as fs from "fs";
 import { ResolveCustomParams } from "../extractProperties";
 //seperate file
-const projectPath = "../Documenting Ukraine/Documentating Ukraine";
+const projectPath = "../../Documenting Ukraine/Documentating Ukraine";
 const configPath = projectPath + "/tsconfig.json";
 const filePath = projectPath + "/src/types/dataTypes/WarCrimes.tsx";
 

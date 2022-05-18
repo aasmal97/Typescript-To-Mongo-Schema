@@ -2,5 +2,38 @@
   "dependencies": {
     "ts-morph": "=14.0.0",
     "typescript": "=4.6.4"
-  }
+  },
+  "name": "ts-to-mongo-schema",
+  "description": "Using the Typescript Compiler API, this program  parses through Typescript, to generate a JSON Schema that conforms to MongoDB's bson format. Useful when generating large schemas, and being unable to use a javascript or typescript library like Moongoose. Intended for use with MongoDB Realm Apps, or MongoDB Atlas. ",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aasmal97/TypeScriptToMongoSchema.git"
+  },
+  "keywords": [
+    "Arky",
+    "Asmal",
+    "Typescript",
+    "MongoDB",
+    "Realm",
+    "Atlas",
+    "BSON",
+    "Schema",
+    "Compiler",
+    "API"
+  ],
+  "author": "Arky Asmal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aasmal97/TypeScriptToMongoSchema/issues"
+  },
+  "homepage": "https://github.com/aasmal97/TypeScriptToMongoSchema#readme"
 }
