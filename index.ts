@@ -12,5 +12,6 @@ export { default as searchForExport } from "./utilityFuncs/searchForExport";
 export { default as categorizeNodes } from "./categorizeNodes";
 export { default as extractProperties } from "./extractProperties";
 export type { ResolveCustomParams, ExtractProps } from "./extractProperties";
-export { generateSchema, GenerateSchema } from "./generateSchema";
+export type { GenerateSchema } from "./generateSchema";
 export type { GenerateFilePathProps } from "./utilityFuncs/generateNewFilePath";
+export { generateSchema } from "./generateSchema"
