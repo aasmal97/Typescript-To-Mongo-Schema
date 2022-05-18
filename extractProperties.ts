@@ -23,6 +23,7 @@ export type ExtractProps = {
   resolveCustomGenerics?: {
     [key: string]: (params: ResolveCustomParams) => any;
   };
+  extension: ".tsx" | ".ts";
 };
 function extractProperties({
   imports,
@@ -31,6 +32,7 @@ function extractProperties({
   paths,
   props,
   resolveCustomGenerics,
+  extension
 }: ExtractProps) {
   switch (ts.SyntaxKind[node.kind]) {
     case "IntersectionType":
@@ -41,6 +43,7 @@ function extractProperties({
         paths,
         props,
         resolveCustomGenerics,
+        extension
       });
       break;
     case "TypeLiteral":
@@ -51,6 +54,7 @@ function extractProperties({
         paths,
         props,
         resolveCustomGenerics,
+        extension
       });
       break;
     case "InterfaceDeclaration":
@@ -61,6 +65,7 @@ function extractProperties({
         paths,
         props,
         resolveCustomGenerics,
+        extension
       });
       break;
     case "TypeAliasDeclaration":
@@ -71,6 +76,7 @@ function extractProperties({
         paths,
         props,
         resolveCustomGenerics,
+        extension
       });
       break;
     case "UnionType":
@@ -86,6 +92,7 @@ function extractProperties({
             paths,
             props: {},
             resolveCustomGenerics,
+            extension
           }),
         });
       });
@@ -98,6 +105,7 @@ function extractProperties({
         paths,
         props,
         resolveCustomGenerics,
+        extension
       });
       break;
     case "TypeReference":
@@ -110,6 +118,7 @@ function extractProperties({
           imports,
           paths,
           resolveCustomGenerics,
+          extension
         });
       } else
         props = parseTypeRef({
@@ -119,6 +128,7 @@ function extractProperties({
           imports,
           paths,
           resolveCustomGenerics,
+          extension
         });
 
       break;
@@ -130,6 +140,7 @@ function extractProperties({
         paths,
         props,
         resolveCustomGenerics,
+        extension
       });
       if (newProps && typeof newProps !== "string") props = newProps;
       break;

@@ -9,7 +9,8 @@ function parseProperties({
   ids,
   paths,
   props,
-  resolveCustomGenerics,
+  resolveCustomGenerics, 
+  extension
 }: ExtractProps) {
   const newProps: { [key: string]: { value: any; required?: boolean } } = {};
   let key: string | undefined = undefined;
@@ -23,6 +24,7 @@ function parseProperties({
       props,
       ids,
       resolveCustomGenerics,
+      extension
     });
     if (isIdentifier(n) && typeof value === "string") key = value;
     else if (value !== undefined) keyProps = value;
@@ -34,6 +36,7 @@ function parseProperties({
         paths,
         props,
         resolveCustomGenerics,
+        extension
       });
   });
   //assign all props extracted

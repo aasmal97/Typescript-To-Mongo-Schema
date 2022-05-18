@@ -6,6 +6,7 @@ export type GenerateSchema = {
   identifier: string;
   filePath: string;
   resolveCustomGenerics?: { [key: string]: (params: any) => any };
+  extension: ".tsx" | ".ts";
 };
 
 export const generateSchema = ({
@@ -13,11 +14,13 @@ export const generateSchema = ({
   filePath,
   identifier,
   resolveCustomGenerics,
+  extension
 }: GenerateSchema) => {
   const { idParent, imports, identifiers } = initalizeNewFile({
     configPath,
     filePath,
     identifier,
+    extension
   });
   if (!idParent) return {};
   const properties = extractProperties({
@@ -31,6 +34,7 @@ export const generateSchema = ({
     },
     props: {},
     resolveCustomGenerics: resolveCustomGenerics,
+    extension
   });
   return properties;
 };

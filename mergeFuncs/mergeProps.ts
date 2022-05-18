@@ -1,6 +1,14 @@
 import extractProperties, { ExtractProps } from "../extractProperties";
 import { isIdentifier } from "typescript";
-function mergeProps({ node, imports, ids, paths, props, resolveCustomGenerics }: ExtractProps) {
+function mergeProps({
+  node,
+  imports,
+  ids,
+  paths,
+  props,
+  resolveCustomGenerics,
+  extension,
+}: ExtractProps) {
   const mergedProps: {
     bsonType: string;
     properties: { [key: string]: any };
@@ -11,14 +19,15 @@ function mergeProps({ node, imports, ids, paths, props, resolveCustomGenerics }:
     required: [],
   };
   node.forEachChild((n) => {
-    if (isIdentifier(n)) return 
+    if (isIdentifier(n)) return;
     const extracted = extractProperties({
       imports,
       ids,
       node: n,
       paths,
       props,
-      resolveCustomGenerics
+      resolveCustomGenerics,
+      extension,
     });
     for (const [key, value] of Object.entries(extracted)) {
       if (value.required) mergedProps.required.push(key);

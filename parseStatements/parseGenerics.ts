@@ -9,6 +9,7 @@ const parseGenerics = ({
   props,
   paths,
   resolveCustomGenerics,
+  extension
 }: Omit<ExtractProps, "node"> & { node: ts.TypeReferenceNode }) => {
   let name: string = "";
   node.forEachChild((n) => {
@@ -27,7 +28,8 @@ const parseGenerics = ({
       ids,
       resolveCustomGenerics,
       paths,
-      props: argProps
+      props: argProps,
+      extension
     });
   }
   const newProps = resolvingFunc({

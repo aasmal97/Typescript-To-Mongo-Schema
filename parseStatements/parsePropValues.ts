@@ -15,6 +15,7 @@ function convertValue({
   props,
   paths,
   resolveCustomGenerics,
+  extension
 }: ExtractProps):
   | string
   | undefined
@@ -35,6 +36,7 @@ function convertValue({
       props,
       paths,
       resolveCustomGenerics,
+      extension
     });
   if (isArrayTypeNode(node))
     return {
@@ -47,6 +49,7 @@ function convertValue({
           props,
           paths,
           resolveCustomGenerics,
+          extension
         }),
       },
     };

@@ -1,5 +1,13 @@
 import extractProperties, { ExtractProps } from "../extractProperties";
-function mergeObj({ node, imports, ids, paths, props, resolveCustomGenerics }: ExtractProps) {
+function mergeObj({
+  node,
+  imports,
+  ids,
+  paths,
+  props,
+  resolveCustomGenerics,
+  extension,
+}: ExtractProps) {
   let mergedProps: {
     [key: string]: any;
   } = {
@@ -14,20 +22,22 @@ function mergeObj({ node, imports, ids, paths, props, resolveCustomGenerics }: E
       node: n,
       paths,
       props,
-      resolveCustomGenerics
+      resolveCustomGenerics,
+      extension,
     });
-      if (extracted.properties && extracted.required)
-          mergedProps = {
-              ...mergedProps,
-              properties: {
-                  ...mergedProps.properties,
-                  ...extracted.properties,
-              },
-              required: [...extracted.required, ...mergedProps.required],
-          };
-      else if (extracted.anyOf) {
-          if(extracted.anyOf.length > 1) mergedProps = { ...mergedProps, ...extracted };
-      }
+    if (extracted.properties && extracted.required)
+      mergedProps = {
+        ...mergedProps,
+        properties: {
+          ...mergedProps.properties,
+          ...extracted.properties,
+        },
+        required: [...extracted.required, ...mergedProps.required],
+      };
+    else if (extracted.anyOf) {
+      if (extracted.anyOf.length > 1)
+        mergedProps = { ...mergedProps, ...extracted };
+    }
   });
   return mergedProps;
 }
