@@ -4,4 +4,4 @@
 *node_modules/*
 node_modules
 node_modules/
-jsonSchema.json
+*jsonSchema.json

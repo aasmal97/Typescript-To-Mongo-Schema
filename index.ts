@@ -1,42 +1,26 @@
-import { Project, ts} from "ts-morph";
-import grabSubNodes from "./searchNodeFunc/findSubNode";
-import categorizeNodes from "./categorizeNodes";
 import extractProperties from "./extractProperties";
-import { isExportSpecifier } from "typescript";
-import findParentTypeAlias from "./searchNodeFunc/findParentTypeNode";
 import * as fs from "fs";
 import path from "path";
-type GenerateSchema = {
+import initalizeNewFile from "./utilityFuncs/initializeNewFile";
+import { ResolveCustomParams } from "./extractProperties";
+export type GenerateSchema = {
   configPath: string;
   identifier: string;
   filePath: string;
+  resolveCustomGenerics?: { [key: string]: (params: any) => any }
 };
 
 export const generateSchema = ({
   configPath,
   filePath,
   identifier,
+  resolveCustomGenerics,
 }: GenerateSchema) => {
-  const project = new Project({
-    tsConfigFilePath: configPath,
+  const { idParent, imports, identifiers } = initalizeNewFile({
+    configPath,
+    filePath,
+    identifier,
   });
-  const file = project.getSourceFileOrThrow(filePath);
-  const node = file.compilerNode;
-  const statements = node.statements;
-  const types = file.getTypeAliases()
-  let nodes: ts.Node[] = [];
-  for (const statement of statements) {
-    nodes = [
-      ...nodes,
-      ...grabSubNodes(
-        statement,
-        (node: ts.Node) => !isExportSpecifier(node.parent)
-      ),
-    ];
-  }
-  const { imports, identifiers } = categorizeNodes(nodes);
-  const idParent = findParentTypeAlias(identifiers[identifier].parent);
-    // console.log(Object.keys(imports), Object.keys(identifiers));
   if (!idParent) return {};
   const properties = extractProperties({
     imports: imports,
@@ -48,6 +32,7 @@ export const generateSchema = ({
       identifier,
     },
     props: {},
+    resolveCustomGenerics: resolveCustomGenerics,
   });
   return properties;
 };
@@ -60,6 +45,15 @@ const jsonSchema = generateSchema({
   configPath: configPath,
   identifier: "WarCrimes",
   filePath: filePath,
+  resolveCustomGenerics: {
+    ArrayOneOrMore: (props: ResolveCustomParams) => {
+      return {
+        bsonType: "array",
+        items: props.combinedProperties,
+        minItems: 1,
+      };
+    },
+  },
 });
 const currDirectory = path.join(__dirname, "/jsonSchema.json");
 fs.writeFile(

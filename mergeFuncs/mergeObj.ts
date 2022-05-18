@@ -1,5 +1,5 @@
 import extractProperties, { ExtractProps } from "../extractProperties";
-function mergeObj({ node, imports, ids, paths, props }: ExtractProps) {
+function mergeObj({ node, imports, ids, paths, props, resolveCustomGenerics }: ExtractProps) {
   let mergedProps: {
     [key: string]: any;
   } = {
@@ -13,7 +13,8 @@ function mergeObj({ node, imports, ids, paths, props }: ExtractProps) {
       ids,
       node: n,
       paths,
-      props
+      props,
+      resolveCustomGenerics
     });
       if (extracted.properties && extracted.required)
           mergedProps = {

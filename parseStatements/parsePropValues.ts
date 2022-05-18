@@ -1,12 +1,21 @@
 import { ts } from "ts-morph";
 import {
+  isArrayTypeNode,
   isIdentifier,
   isLiteralTypeNode,
   isNumericLiteral,
   isStringLiteral,
 } from "typescript";
-
-function convertValue(node: ts.Node):
+import extractProperties from "../extractProperties";
+import { ExtractProps } from "../extractProperties";
+function convertValue({
+  node,
+  ids,
+  imports,
+  props,
+  paths,
+  resolveCustomGenerics,
+}: ExtractProps):
   | string
   | undefined
   | {
@@ -18,7 +27,29 @@ function convertValue(node: ts.Node):
     if (name === "Date") return { bsonType: "date" };
     return name;
   }
-  if (isLiteralTypeNode(node)) return convertValue(node.literal);
+  if (isLiteralTypeNode(node))
+    return convertValue({
+      node: node.literal,
+      ids,
+      imports,
+      props,
+      paths,
+      resolveCustomGenerics,
+    });
+  if (isArrayTypeNode(node))
+    return {
+      bsonType: "array",
+      items: {
+        ...extractProperties({
+          node: node.elementType,
+          ids,
+          imports,
+          props,
+          paths,
+          resolveCustomGenerics,
+        }),
+      },
+    };
   if (isStringLiteral(node))
     return {
       bsonType: "string",

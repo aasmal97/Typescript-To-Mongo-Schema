@@ -1,13 +1,15 @@
-import { ts, TypeChecker } from "ts-morph";
-import { isIdentifier, isInterfaceDeclaration, isPropertySignature, isTypeAliasDeclaration } from "typescript";
-import findParentTypeAlias from "./searchNodeFunc/findParentTypeNode";
+import { ts } from "ts-morph";
+import { isTypeReferenceNode } from "typescript";
 import mergeProps from "./mergeFuncs/mergeProps";
 import parseProperties from "./parseStatements/parseProperties";
-import { generateSchema } from "./";
 import mergeObj from "./mergeFuncs/mergeObj";
-import path from "path";
 import convertValue from "./parseStatements/parsePropValues";
 import parseGenerics from "./parseStatements/parseGenerics";
+import parseTypeRef from "./parseStatements/parseTypeRefs";
+export type ResolveCustomParams = {
+  propertiesPerArg?: any[];
+  combinedProperties?: { [key: string]: any };
+};
 export type ExtractProps = {
   imports: { [key: string]: string };
   ids: { [key: string]: ts.Node };
@@ -18,21 +20,58 @@ export type ExtractProps = {
     filePath: string;
     identifier: string;
   };
+  resolveCustomGenerics?: {
+    [key: string]: (params: ResolveCustomParams) => any;
+  };
 };
-
-function extractProperties({ imports, ids, node, paths, props }: ExtractProps) {
+function extractProperties({
+  imports,
+  ids,
+  node,
+  paths,
+  props,
+  resolveCustomGenerics,
+}: ExtractProps) {
   switch (ts.SyntaxKind[node.kind]) {
     case "IntersectionType":
-      props = mergeObj({ node, imports, ids, paths, props });
+      props = mergeObj({
+        node,
+        imports,
+        ids,
+        paths,
+        props,
+        resolveCustomGenerics,
+      });
       break;
     case "TypeLiteral":
-      props = mergeProps({ node, imports, ids, paths, props });
+      props = mergeProps({
+        node,
+        imports,
+        ids,
+        paths,
+        props,
+        resolveCustomGenerics,
+      });
       break;
     case "InterfaceDeclaration":
-      props = mergeProps({ node, imports, ids, paths, props });
+      props = mergeProps({
+        node,
+        imports,
+        ids,
+        paths,
+        props,
+        resolveCustomGenerics,
+      });
       break;
-    case "TypeAliasDeclaration":      
-      props = mergeObj({ node, imports, ids, paths, props });
+    case "TypeAliasDeclaration":
+      props = mergeObj({
+        node,
+        imports,
+        ids,
+        paths,
+        props,
+        resolveCustomGenerics,
+      });
       break;
     case "UnionType":
       props = {
@@ -40,81 +79,58 @@ function extractProperties({ imports, ids, node, paths, props }: ExtractProps) {
       };
       node.forEachChild((n) => {
         props.anyOf.push({
-          ...extractProperties({ imports, ids, node: n, paths, props: {} }),
+          ...extractProperties({
+            imports,
+            ids,
+            node: n,
+            paths,
+            props: {},
+            resolveCustomGenerics,
+          }),
         });
       });
       break;
     case "PropertySignature":
-      props = parseProperties({ imports, ids, node, paths, props });
-      break;
-    case "TypeReference":
-      node.forEachChild((node) => {
-        if (isIdentifier(node)) {
-          const nodeName = node.escapedText.toString();
-          switch (true) {
-            //built in types
-            case nodeName === "Date":
-              props = { bsonType: "date" };
-              break;
-            case nodeName === "ObjectId":
-              props = { bsonType: "objectId" };
-              break;
-            //lookup node in ids, and recurse back to find props
-            case nodeName in ids:
-              const idParent = findParentTypeAlias(ids[nodeName].parent);
-              if (!idParent) return props;
-              else if (isInterfaceDeclaration(idParent))
-                props = mergeProps({
-                  node: idParent,
-                  imports,
-                  ids,
-                  paths,
-                  props,
-                });
-              else
-                props = mergeObj({
-                  node: idParent,
-                  imports,
-                  ids,
-                  paths,
-                  props,
-                });
-              break;
-            case nodeName in imports:
-              /*
-                  1. lookup node in imports, and find file. 
-                  2. Then find id, and recurse back to find props
-              */
-              const importRelative = imports[nodeName].substring(
-                1,
-                imports[nodeName].length - 1
-              );
-              const newPathRelative = importRelative + ".tsx";
-              const parsedRelative = newPathRelative.split(path.posix.sep);
-              let newFilePath = paths.filePath;
-              for (let segment of parsedRelative) {
-                let newSegment = segment;
-                if (segment === ".") newSegment = "..";
-                else if (segment === "..") newSegment = "../../";
-                newFilePath = path.resolve(newFilePath, newSegment);
-              }
-              props = {
-                ...props,
-                ...generateSchema({
-                  configPath: paths.configPath,
-                  filePath: newFilePath,
-                  identifier: nodeName,
-                }),
-              };
-              break;
-            default:
-              break;
-          }
-        }
+      props = parseProperties({
+        imports,
+        ids,
+        node,
+        paths,
+        props,
+        resolveCustomGenerics,
       });
       break;
+    case "TypeReference":
+      //parse generics
+      if (isTypeReferenceNode(node) && node.typeArguments) {
+        props = parseGenerics({
+          node,
+          props,
+          ids,
+          imports,
+          paths,
+          resolveCustomGenerics,
+        });
+      } else
+        props = parseTypeRef({
+          node,
+          props,
+          ids,
+          imports,
+          paths,
+          resolveCustomGenerics,
+        });
+
+      break;
     default:
-      const newProps = convertValue(node);
+      const newProps = convertValue({
+        node: node,
+        ids,
+        imports,
+        paths,
+        props,
+        resolveCustomGenerics,
+      });
       if (newProps && typeof newProps !== "string") props = newProps;
       break;
   }
