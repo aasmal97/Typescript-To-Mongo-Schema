@@ -20,7 +20,12 @@ The program traverses all nodes that the interface or type depends on, according
 <details>
 <summary>Click To Expand!</summary>
  <br>
-  
+
+### Installation
+  ```
+  npm i ts-to-mongo-schema
+  ```
+### Function Parameters 
 ```typescript
 type GenerateSchema = {
   //Path to the tsconfig.json of the target project
@@ -44,7 +49,7 @@ type GenerateSchema = {
   resolveCustomGenerics?: { [key: string]: (params: any) => any };
 };
 ```
-Example: 
+### Example: 
 ```typescript
 import { generateSchema, ResolveCustomParams } from "ts-to-mongo-schema";
 import * as fs from "fs";
