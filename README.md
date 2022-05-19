@@ -46,8 +46,7 @@ type GenerateSchema = {
 ```
 Example: 
 ```typescript
-import { generateSchema } from "..";
-import { ResolveCustomParams } from "..";
+import { generateSchema, ResolveCustomParams } from "ts-to-mongo-schema";
 import * as fs from "fs";
 
 //paths
