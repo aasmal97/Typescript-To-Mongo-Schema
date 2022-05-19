@@ -11,6 +11,7 @@ const jsonSchema = generateSchema({
   configPath: configPath,
   identifier: "WarCrimes",
   filePath: filePath,
+  extension: '.tsx',
   resolveCustomGenerics: {
     ArrayOneOrMore: (props: ResolveCustomParams) => {
       return {
