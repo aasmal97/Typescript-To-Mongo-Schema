@@ -5,14 +5,18 @@
   },
   "name": "ts-to-mongo-schema",
   "description": "Using the Typescript Compiler API, this program  parses through Typescript, to generate a JSON Schema that conforms to MongoDB's bson format. Useful when generating large schemas, and being unable to use a javascript or typescript library like Moongoose. Intended for use with MongoDB Realm Apps, or MongoDB Atlas. ",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "directories": {
     "test": "tests"
   },
-  "main": "./lib/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
